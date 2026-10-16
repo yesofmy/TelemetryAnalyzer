@@ -18,3 +18,5 @@ D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-win
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows\TelemetryAnalyzer.App.genruntimeconfig.cache
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows\ref\TelemetryAnalyzer.App.dll
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows\TelemetryAnalyzer.App.sourcelink.json
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows\CsvImportWindow.baml
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows\CsvImportWindow.g.cs

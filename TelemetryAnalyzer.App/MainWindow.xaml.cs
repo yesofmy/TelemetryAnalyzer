@@ -107,22 +107,11 @@ public partial class MainWindow : Window
 
     private void ImportCsv_Click(object sender, RoutedEventArgs e)
     {
-        OpenFileDialog dialog = new()
+        CsvImportWindow window = new()
         {
-            Title = "Select telemetry CSV file",
-            Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
-            CheckFileExists = true,
-            Multiselect = false
+            Owner = this
         };
 
-        if (dialog.ShowDialog() == true)
-        {
-            MessageBox.Show(
-                $"Selected file:\n{dialog.FileName}\n\n" +
-                "CSV import processing will be implemented in the next step.",
-                "Telemetry Analyzer",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
+        window.ShowDialog();
     }
 }
