@@ -16,7 +16,46 @@ namespace TelemetryAnalyzer.App
         private readonly List<TrackPoint> _trackPoints = new();
 
         private const double CanvasPadding = 40;
+        
+        
+        private sealed class CornerInfo
+        {
+            public int Number { get; }
+            public string Name { get; }
+            public double DistanceMeters { get; }
 
+            public CornerInfo(int number, string name, double distanceMeters)
+            {
+                Number = number;
+                Name = name;
+                DistanceMeters = distanceMeters;
+            }
+        }
+
+        private static readonly CornerInfo[] Corners =
+        {
+            new(1,  "La Source",          220),
+            new(2,  "Eau Rouge",          690),
+            new(3,  "Raidillon",          890),
+            new(4,  "Raidillon",         1130),
+            new(5,  "Les Combes",        2200),
+            new(6,  "Les Combes",        2350),
+            new(7,  "Malmedy",           2470),
+            new(8,  "Bruxelles / Rivage",3110),
+            new(9,  "Jacky Ickx",        3400),
+            new(10, "Pouhon",            3600),
+            new(11, "Pouhon",            3900),
+            new(12, "Fagnes",            4280),
+            new(13, "Fagnes",            4500),
+            new(14, "Stavelot",          4740),
+            new(15, "Paul Frere",        5100),
+            new(16, "Blanchimont",       5700),
+            new(17, "Blanchimont",       6000),
+            new(18, "Bus Stop",          6540),
+            new(19, "Bus Stop",          6700)
+        };
+
+        
         private static readonly Brush TrackBrush =
             new SolidColorBrush(Color.FromRgb(65, 73, 82));
 
@@ -199,7 +238,7 @@ namespace TelemetryAnalyzer.App
             {
                 return;
             }
-
+            
             DrawGrid(width, height);
 
             double minX = double.PositiveInfinity;
@@ -318,6 +357,7 @@ namespace TelemetryAnalyzer.App
             AddPolyline(leftEdge, BoundaryBrush, 1.2);
             AddPolyline(rightEdge, BoundaryBrush, 1.2);
             AddPolyline(centerLine, CenterLineBrush, 1.6);
+            DrawCornerMarkers(centerLine);
 
             if (leftEdge.Count > 0 && rightEdge.Count > 0)
             {
@@ -343,6 +383,106 @@ namespace TelemetryAnalyzer.App
                 12);
         }
 
+        
+        private void DrawCornerMarkers(List<Point> centerLine)
+        {
+            if (centerLine.Count < 3)
+                return;
+
+            // Approximate cumulative distance along the displayed center line.
+            var cumulative = new double[centerLine.Count];
+
+            for (int i = 1; i < centerLine.Count; i++)
+            {
+                double dx = centerLine[i].X - centerLine[i - 1].X;
+                double dy = centerLine[i].Y - centerLine[i - 1].Y;
+
+                cumulative[i] = cumulative[i - 1] +
+                                Math.Sqrt(dx * dx + dy * dy);
+            }
+
+            double totalLength = cumulative[^1];
+
+            if (totalLength <= 0)
+                return;
+
+            foreach (CornerInfo corner in Corners)
+            {
+                double fraction = Math.Clamp(
+                    corner.DistanceMeters / 7004.0, 0.0, 1.0);
+
+                double targetDistance = fraction * totalLength;
+
+                int index = 0;
+
+                while (index < cumulative.Length - 1 &&
+                    cumulative[index] < targetDistance)
+                {
+                    index++;
+                }
+
+                Point point = centerLine[index];
+
+                var marker = new System.Windows.Shapes.Ellipse
+                {
+                    Width = 25,
+                    Height = 25,
+                    Fill = new SolidColorBrush(
+                        Color.FromRgb(255, 159, 67)),
+                    Stroke = Brushes.White,
+                    StrokeThickness = 1.2,
+                    ToolTip = $"Turn {corner.Number}: {corner.Name}"
+                };
+
+                Canvas.SetLeft(marker, point.X - 12.5);
+                Canvas.SetTop(marker, point.Y - 12.5);
+                Panel.SetZIndex(marker, 10);
+
+                TrackCanvas.Children.Add(marker);
+
+                var numberLabel = new TextBlock
+                {
+                    Text = corner.Number.ToString(),
+                    Foreground = Brushes.Black,
+                    FontSize = 11,
+                    FontWeight = FontWeights.Bold,
+                    TextAlignment = TextAlignment.Center,
+                    Width = 25,
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(numberLabel, point.X - 12.5);
+                Canvas.SetTop(numberLabel, point.Y - 7.5);
+                Panel.SetZIndex(numberLabel, 11);
+
+                TrackCanvas.Children.Add(numberLabel);
+
+                double labelOffsetY =
+                    corner.Number % 2 == 0 ? 15 : -28;
+
+                var nameLabel = new TextBlock
+                {
+                    Text = corner.Name,
+                    Foreground = Brushes.White,
+                    Background = new SolidColorBrush(
+                        Color.FromArgb(220, 25, 29, 36)),
+                    FontSize = 10,
+                    FontWeight = FontWeights.SemiBold,
+                    Padding = new Thickness(4, 2, 4, 2),
+                    MaxWidth = 145,
+                    TextWrapping = TextWrapping.Wrap,
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(nameLabel, point.X + 14);
+                Canvas.SetTop(nameLabel, point.Y + labelOffsetY);
+                Panel.SetZIndex(nameLabel, 12);
+
+                TrackCanvas.Children.Add(nameLabel);
+            }
+        }
+
+        
         private void DrawGrid(double width, double height)
         {
             const double spacing = 40;
