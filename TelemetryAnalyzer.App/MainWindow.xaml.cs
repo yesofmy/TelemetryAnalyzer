@@ -36,6 +36,18 @@ public partial class MainWindow : Window
 
     private static readonly SolidColorBrush GreenBrush =
         new(Color.FromRgb(85, 214, 160));
+    
+    private void RaceReplay_Click(
+        object sender,
+        System.Windows.RoutedEventArgs e)
+    {
+        RaceReplayWindow window = new()
+        {
+            Owner = this
+        };
+
+        window.ShowDialog();
+    }
 
     public MainWindow()
     {
@@ -206,6 +218,43 @@ public partial class MainWindow : Window
     }
 
     // ---------------------------------------------------------
+    // TELEMETRY ANALYSIS
+    // ---------------------------------------------------------
+
+    private void RecentSessionsList_MouseDoubleClick(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (RecentSessionsList.SelectedItem is TelemetrySession session)
+        {
+            OpenTelemetryAnalysis(session);
+        }
+    }
+
+    private void OpenTelemetryAnalysis(TelemetrySession session)
+    {
+        if (session.Records.Count == 0)
+        {
+            MessageBox.Show(
+                "This session does not contain telemetry records to analyze.",
+                "Telemetry Analysis",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            return;
+        }
+
+        TelemetryAnalysisWindow window = new(session)
+        {
+            Owner = this
+        };
+
+        window.ShowDialog();
+
+        RefreshDashboard();
+    }
+
+    // ---------------------------------------------------------
     // CSV IMPORT
     // ---------------------------------------------------------
 
@@ -242,7 +291,7 @@ public partial class MainWindow : Window
             CreateHeading("Your telemetry sessions"));
 
         introContent.Children.Add(CreateMutedText(
-            "Review imported files and the number of telemetry records in each session.",
+            "Review imported files and analyze telemetry records.",
             8));
 
         Button importButton = CreatePrimaryButton("+  Import CSV");
@@ -264,7 +313,7 @@ public partial class MainWindow : Window
         listContent.Children.Add(CreateHeading("Imported sessions"));
 
         listContent.Children.Add(CreateMutedText(
-            "The list is loaded from your local database.",
+            "Choose Analyze to open detailed telemetry statistics and charts.",
             6));
 
         try
@@ -347,6 +396,14 @@ public partial class MainWindow : Window
             Margin = new Thickness(0, 6, 0, 0)
         });
 
+        Button analyzeButton = CreatePrimaryButton("Analyze  →");
+
+        analyzeButton.Margin = new Thickness(0, 12, 0, 0);
+        analyzeButton.HorizontalAlignment = HorizontalAlignment.Left;
+        analyzeButton.Click += (_, _) => OpenTelemetryAnalysis(session);
+
+        details.Children.Add(analyzeButton);
+
         Grid.SetColumn(details, 0);
         grid.Children.Add(details);
 
@@ -416,7 +473,6 @@ public partial class MainWindow : Window
             Width = new GridLength(1, GridUnitType.Star)
         });
 
-        // Track preview placeholder
         Border preview = new()
         {
             Background = new SolidColorBrush(

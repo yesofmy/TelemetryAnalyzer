@@ -46,8 +46,7 @@
                                 <Setter TargetName="NavBorder"
                                         Property="Background"
                                         Value="#242A33"/>
-                                <Setter Property="Foreground"
-                                        Value="#FFFFFF"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="NavBorder"
@@ -133,7 +132,6 @@
                 BorderThickness="0,0,1,0">
 
             <DockPanel LastChildFill="True">
-
                 <StackPanel DockPanel.Dock="Top"
                             Margin="22,26,22,30">
                     <Border Width="48"
@@ -185,7 +183,6 @@
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="12,0,12,0">
-
                         <TextBlock Text="WORKSPACE"
                                    Foreground="#747D8A"
                                    FontSize="10"
@@ -227,6 +224,10 @@
                                 Content="⚙    Settings"
                                 Style="{StaticResource NavButtonStyle}"
                                 Click="Settings_Click"/>
+                        <Button Content="Race Replay"
+                                Click="RaceReplay_Click"
+                                Margin="8"
+                                Padding="12,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
@@ -324,7 +325,6 @@
 
                     <!-- STATISTICS -->
                     <UniformGrid Columns="4" Margin="0,0,0,22">
-
                         <Border Style="{StaticResource PanelStyle}"
                                 Margin="0,0,10,0">
                             <StackPanel>
@@ -426,7 +426,7 @@
                                 <TextBlock Text="RECENT SESSIONS"
                                            Style="{StaticResource SectionTitleStyle}"/>
 
-                                <TextBlock Text="Your latest imported telemetry data"
+                                <TextBlock Text="Double-click a session to analyze telemetry."
                                            Style="{StaticResource MutedTextStyle}"
                                            Margin="0,7,0,18"/>
 
@@ -441,7 +441,8 @@
                                                  BorderThickness="0"
                                                  Foreground="#E8EAED"
                                                  MaxHeight="270"
-                                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                 MouseDoubleClick="RecentSessionsList_MouseDoubleClick">
 
                                             <ListBox.ItemContainerStyle>
                                                 <Style TargetType="ListBoxItem">
@@ -550,7 +551,6 @@
 
                         <!-- RIGHT COLUMN -->
                         <StackPanel Grid.Column="1">
-
                             <Border Style="{StaticResource PanelStyle}"
                                     Margin="0,0,0,14">
 

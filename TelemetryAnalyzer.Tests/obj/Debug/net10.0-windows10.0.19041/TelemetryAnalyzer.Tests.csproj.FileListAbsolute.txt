@@ -243,3 +243,4 @@ D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Tests\obj\Debug\net10.0-w
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Tests\obj\Debug\net10.0-windows10.0.19041\TelemetryAnalyzer.Tests.genruntimeconfig.cache
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Tests\obj\Debug\net10.0-windows10.0.19041\ref\TelemetryAnalyzer.Tests.dll
 D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Tests\bin\Debug\net10.0-windows10.0.19041\Data\tracks\spa.csv
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Tests\bin\Debug\net10.0-windows10.0.19041\Data\telemetry\spa_telemetry.csv
