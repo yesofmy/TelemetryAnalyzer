@@ -1,0 +1,495 @@
+﻿<Window x:Class="TelemetryAnalyzer.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Telemetry Analyzer"
+        Width="1440"
+        Height="900"
+        MinWidth="1100"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#111318"
+        Foreground="#E8EAED"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#111318"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#1A1E25"/>
+        <SolidColorBrush x:Key="PanelLightBrush" Color="#242A33"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#FF9F43"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#9299A5"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#303641"/>
+
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#AEB5C0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="18,13"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NavBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder"
+                                        Property="Background"
+                                        Value="#242A33"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="NavBorder"
+                                        Property="Background"
+                                        Value="#343B46"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="22"/>
+        </Style>
+
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="#111318"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="18,11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="7"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#FFB66D"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#E88A30"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT SIDEBAR -->
+        <Border Grid.Column="0"
+                Background="#171A20"
+                BorderBrush="#2B3039"
+                BorderThickness="0,0,1,0">
+
+            <DockPanel LastChildFill="True">
+
+                <StackPanel DockPanel.Dock="Top" Margin="22,26,22,30">
+                    <TextBlock Text="TA"
+                               Foreground="#FF9F43"
+                               FontSize="34"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="TELEMETRY ANALYZER"
+                               Foreground="#FFFFFF"
+                               FontSize="13"
+                               FontWeight="Bold"
+                               Margin="0,5,0,0"/>
+                    <TextBlock Text="MOTORSPORT DATA SYSTEM"
+                               Foreground="#747D8A"
+                               FontSize="9"
+                               Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom"
+                            Margin="20,15,20,22">
+                    <Border Height="1"
+                            Background="#303641"
+                            Margin="0,0,0,15"/>
+                    <TextBlock Text="PROJECT VERSION"
+                               Foreground="#747D8A"
+                               FontSize="10"/>
+                    <TextBlock Text="v0.1.0 · DEVELOPMENT"
+                               Foreground="#AEB5C0"
+                               FontSize="11"
+                               Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="12,0,12,0">
+                        <TextBlock Text="WORKSPACE"
+                                   Foreground="#747D8A"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="12,0,0,10"/>
+
+                        <Button Content="▦    Dashboard"
+                                Style="{StaticResource NavButtonStyle}"
+                                Background="#30271F"
+                                Foreground="#FF9F43"
+                                FontWeight="SemiBold"
+                                Click="Dashboard_Click"/>
+
+                        <Button Content="◷    Sessions &amp; Import"
+                                Style="{StaticResource NavButtonStyle}"
+                                Click="Sessions_Click"/>
+
+                        <Button Content="⌁    Telemetry Studio"
+                                Style="{StaticResource NavButtonStyle}"
+                                Click="Telemetry_Click"/>
+
+                        <Button Content="∿    Signal Analysis"
+                                Style="{StaticResource NavButtonStyle}"
+                                Click="Analysis_Click"/>
+
+                        <TextBlock Text="REFERENCE DATA"
+                                   Foreground="#747D8A"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="12,28,0,10"/>
+
+                        <Button Content="◎    Tracks"
+                                Style="{StaticResource NavButtonStyle}"
+                                Click="Tracks_Click"/>
+
+                        <Button Content="⚙    Settings"
+                                Style="{StaticResource NavButtonStyle}"
+                                Click="Settings_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="76"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- TOP BAR -->
+            <Border Grid.Row="0"
+                    Background="#171A20"
+                    BorderBrush="#2B3039"
+                    BorderThickness="0,0,0,1">
+                <Grid Margin="30,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="PageTitle"
+                                   Text="Dashboard"
+                                   Foreground="#FFFFFF"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock x:Name="PageSubtitle"
+                                   Text="Overview of your telemetry workspace"
+                                   Foreground="#9299A5"
+                                   FontSize="11"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            Background="#242A33"
+                            CornerRadius="7"
+                            Padding="13,8"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7"
+                                     Height="7"
+                                     Fill="#55D6A0"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,8,0"/>
+                            <TextBlock Text=".NET 10 · LOCAL"
+                                       Foreground="#C7CDD6"
+                                       FontSize="11"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- DASHBOARD PAGE -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="MainContent" Margin="30,28,30,30">
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Welcome to Telemetry Analyzer"
+                                       FontSize="25"
+                                       FontWeight="SemiBold"
+                                       Foreground="#FFFFFF"/>
+                            <TextBlock Text="Import, inspect and analyze motorsport telemetry."
+                                       FontSize="13"
+                                       Foreground="#9299A5"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                Content="+  Import CSV"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                VerticalAlignment="Center"
+                                Click="ImportCsv_Click"/>
+                    </Grid>
+
+                    <!-- STATISTICS -->
+                    <UniformGrid Columns="4" Margin="0,0,0,22">
+
+                        <Border Style="{StaticResource PanelStyle}"
+                                Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="TOTAL SESSIONS"
+                                           Foreground="#9299A5"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock x:Name="SessionsValue"
+                                           Text="0"
+                                           Foreground="#FFFFFF"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"
+                                           Margin="0,12,0,4"/>
+                                <TextBlock Text="Imported sessions"
+                                           Foreground="#747D8A"
+                                           FontSize="11"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource PanelStyle}"
+                                Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="DATA POINTS"
+                                           Foreground="#9299A5"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock x:Name="DataPointsValue"
+                                           Text="0"
+                                           Foreground="#56B4E9"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"
+                                           Margin="0,12,0,4"/>
+                                <TextBlock Text="Telemetry records"
+                                           Foreground="#747D8A"
+                                           FontSize="11"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource PanelStyle}"
+                                Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="TRACKS"
+                                           Foreground="#9299A5"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock x:Name="TracksValue"
+                                           Text="0"
+                                           Foreground="#55D6A0"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"
+                                           Margin="0,12,0,4"/>
+                                <TextBlock Text="Available configurations"
+                                           Foreground="#747D8A"
+                                           FontSize="11"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource PanelStyle}">
+                            <StackPanel>
+                                <TextBlock Text="FILTERS"
+                                           Foreground="#9299A5"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="1"
+                                           Foreground="#FF9F43"
+                                           FontSize="30"
+                                           FontWeight="SemiBold"
+                                           Margin="0,12,0,4"/>
+                                <TextBlock Text="Planned baseline algorithm"
+                                           Foreground="#747D8A"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- LOWER PANELS -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.45*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Style="{StaticResource PanelStyle}"
+                                Margin="0,0,11,0"
+                                MinHeight="300">
+
+                            <StackPanel>
+                                <TextBlock Text="RECENT SESSIONS"
+                                           Foreground="#FFFFFF"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+
+                                <TextBlock Text="Your imported telemetry files will appear here."
+                                           Foreground="#9299A5"
+                                           FontSize="12"
+                                           Margin="0,7,0,20"/>
+
+                                <Border Background="#20252D"
+                                        CornerRadius="9"
+                                        Padding="20"
+                                        MinHeight="170">
+                                    <StackPanel VerticalAlignment="Center"
+                                                HorizontalAlignment="Center">
+                                        <TextBlock Text="◷"
+                                                   Foreground="#FF9F43"
+                                                   FontSize="34"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="No sessions yet"
+                                                   Foreground="#FFFFFF"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,10,0,5"/>
+                                        <TextBlock Text="Import a CSV file to get started."
+                                                   Foreground="#9299A5"
+                                                   FontSize="11"
+                                                   HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Button Content="Open sessions"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,17,0,0"
+                                        Style="{StaticResource NavButtonStyle}"
+                                        Click="Sessions_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="1">
+
+                            <Border Style="{StaticResource PanelStyle}"
+                                    Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="QUICK ACTIONS"
+                                               Foreground="#FFFFFF"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,13"/>
+
+                                    <Button Content="+    Import telemetry CSV"
+                                            Style="{StaticResource NavButtonStyle}"
+                                            Click="ImportCsv_Click"/>
+
+                                    <Button Content="∿    Open signal analysis"
+                                            Style="{StaticResource NavButtonStyle}"
+                                            Click="Analysis_Click"/>
+
+                                    <Button Content="◎    Browse track data"
+                                            Style="{StaticResource NavButtonStyle}"
+                                            Click="Tracks_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource PanelStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="SYSTEM STATUS"
+                                               Foreground="#FFFFFF"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,14"/>
+
+                                    <Grid Margin="0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Application"
+                                                   Foreground="#AEB5C0"
+                                                   FontSize="12"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="Ready"
+                                                   Foreground="#55D6A0"
+                                                   FontSize="12"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Database"
+                                                   Foreground="#AEB5C0"
+                                                   FontSize="12"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="Not configured"
+                                                   Foreground="#FF9F43"
+                                                   FontSize="12"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Telemetry source"
+                                                   Foreground="#AEB5C0"
+                                                   FontSize="12"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="Not imported"
+                                                   Foreground="#FF9F43"
+                                                   FontSize="12"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="TELEMETRY ANALYZER  /  ENGINEERING WORKSPACE"
+                               Foreground="#59616D"
+                               FontSize="9"
+                               Margin="0,24,0,0"
+                               HorizontalAlignment="Right"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

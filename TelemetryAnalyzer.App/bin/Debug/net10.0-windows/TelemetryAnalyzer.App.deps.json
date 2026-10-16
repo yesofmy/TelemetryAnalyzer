@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "TelemetryAnalyzer.App/1.0.0": {
+        "runtime": {
+          "TelemetryAnalyzer.App.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TelemetryAnalyzer.App/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
