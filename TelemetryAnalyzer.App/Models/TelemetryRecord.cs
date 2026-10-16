@@ -2,6 +2,12 @@ namespace TelemetryAnalyzer.App.Models;
 
 public sealed class TelemetryRecord
 {
+    public int Id { get; set; }
+
+    public int SessionId { get; set; }
+
+    public TelemetrySession? Session { get; set; }
+
     public int Index { get; set; }
 
     public double? Time { get; set; }

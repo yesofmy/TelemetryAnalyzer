@@ -30,6 +30,8 @@ public partial class CsvImportWindow : Window
         {
             TelemetryImportResult result = _importer.Import(dialog.FileName);
 
+            TelemetryAnalyzer.App.App.Database.SaveSession(result.Session);
+
             FilePathText.Text = dialog.FileName;
             ColumnCountText.Text = result.ColumnCount.ToString("N0");
             RowCountText.Text = result.ValidRowCount.ToString("N0");

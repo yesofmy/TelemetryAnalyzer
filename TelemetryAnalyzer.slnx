@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TelemetryAnalyzer.App/TelemetryAnalyzer.App.csproj" />
+  <Project Path="TelemetryAnalyzer.Core/TelemetryAnalyzer.Core.csproj" />
+  <Project Path="TelemetryAnalyzer.Tests/TelemetryAnalyzer.Tests.csproj" />
+</Solution>

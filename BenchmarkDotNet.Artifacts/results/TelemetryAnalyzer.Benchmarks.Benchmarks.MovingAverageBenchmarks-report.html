@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>TelemetryAnalyzer.Benchmarks.Benchmarks.MovingAverageBenchmarks-20261016-201813</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.26300.9711)
+AMD Ryzen 7 7735HS with Radeon Graphics 3.20GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.401
+  [Host]     : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v3
+  DefaultJob : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method          </th><th>DataSize</th><th>WindowSize</th><th>Mean  </th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Gen2</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>NaiveMovingAverage</td><td>1000</td><td>10</td><td>4.521 &mu;s</td><td>0.0899 &mu;s</td><td>0.0883 &mu;s</td><td>4.509 &mu;s</td><td>1.00</td><td>0.03</td><td>0.9537</td><td>-</td><td>-</td><td>7.84 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>1000</td><td>10</td><td>1.758 &mu;s</td><td>0.0349 &mu;s</td><td>0.0774 &mu;s</td><td>1.771 &mu;s</td><td>0.39</td><td>0.02</td><td>0.9575</td><td>-</td><td>-</td><td>7.84 KB</td><td>1.00</td>
+</tr><tr><td>NaiveMovingAverage</td><td>1000</td><td>50</td><td>23.992 &mu;s</td><td>0.4678 &mu;s</td><td>0.5569 &mu;s</td><td>23.788 &mu;s</td><td>1.00</td><td>0.03</td><td>0.9460</td><td>-</td><td>-</td><td>7.84 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>1000</td><td>50</td><td>1.753 &mu;s</td><td>0.0372 &mu;s</td><td>0.1090 &mu;s</td><td>1.714 &mu;s</td><td>0.07</td><td>0.00</td><td>0.9575</td><td>-</td><td>-</td><td>7.84 KB</td><td>1.00</td>
+</tr><tr><td>NaiveMovingAverage</td><td>10000</td><td>10</td><td>44.608 &mu;s</td><td>0.7622 &mu;s</td><td>0.7130 &mu;s</td><td>44.848 &mu;s</td><td>1.00</td><td>0.02</td><td>9.5215</td><td>-</td><td>-</td><td>78.15 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>10000</td><td>10</td><td>16.944 &mu;s</td><td>0.3354 &mu;s</td><td>0.2973 &mu;s</td><td>16.888 &mu;s</td><td>0.38</td><td>0.01</td><td>9.5215</td><td>-</td><td>-</td><td>78.15 KB</td><td>1.00</td>
+</tr><tr><td>NaiveMovingAverage</td><td>10000</td><td>50</td><td>238.108 &mu;s</td><td>1.2238 &mu;s</td><td>1.1447 &mu;s</td><td>237.628 &mu;s</td><td>1.00</td><td>0.01</td><td>9.5215</td><td>-</td><td>-</td><td>78.15 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>10000</td><td>50</td><td>17.891 &mu;s</td><td>0.3568 &mu;s</td><td>0.9337 &mu;s</td><td>17.782 &mu;s</td><td>0.08</td><td>0.00</td><td>9.5215</td><td>-</td><td>-</td><td>78.15 KB</td><td>1.00</td>
+</tr><tr><td>NaiveMovingAverage</td><td>100000</td><td>10</td><td>549.716 &mu;s</td><td>10.9303 &mu;s</td><td>14.5917 &mu;s</td><td>550.178 &mu;s</td><td>1.00</td><td>0.04</td><td>249.0234</td><td>249.0234</td><td>249.0234</td><td>781.36 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>100000</td><td>10</td><td>278.669 &mu;s</td><td>4.2981 &mu;s</td><td>4.0204 &mu;s</td><td>277.685 &mu;s</td><td>0.51</td><td>0.01</td><td>249.5117</td><td>249.5117</td><td>249.5117</td><td>781.36 KB</td><td>1.00</td>
+</tr><tr><td>NaiveMovingAverage</td><td>100000</td><td>50</td><td>2,499.750 &mu;s</td><td>20.6964 &mu;s</td><td>19.3594 &mu;s</td><td>2,499.245 &mu;s</td><td>1.00</td><td>0.01</td><td>246.0938</td><td>246.0938</td><td>246.0938</td><td>781.35 KB</td><td>1.00</td>
+</tr><tr><td>OptimizedMovingAverage</td><td>100000</td><td>50</td><td>273.361 &mu;s</td><td>3.9487 &mu;s</td><td>3.2973 &mu;s</td><td>272.301 &mu;s</td><td>0.11</td><td>0.00</td><td>249.5117</td><td>249.5117</td><td>249.5117</td><td>781.36 KB</td><td>1.00</td>
+</tr></tbody></table>
+</body>
+</html>

@@ -1,0 +1,12 @@
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\bin\Release\net10.0\TelemetryAnalyzer.Core.deps.json
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\bin\Release\net10.0\TelemetryAnalyzer.Core.dll
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\bin\Release\net10.0\TelemetryAnalyzer.Core.pdb
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.AssemblyInfoInputs.cache
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.AssemblyInfo.cs
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.csproj.CoreCompileInputs.cache
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.sourcelink.json
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.dll
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\refint\TelemetryAnalyzer.Core.dll
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\TelemetryAnalyzer.Core.pdb
+D:\programs\github\telemetryanalyzer\TelemetryAnalyzer.Core\obj\Release\net10.0\ref\TelemetryAnalyzer.Core.dll
