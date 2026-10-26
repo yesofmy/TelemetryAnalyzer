@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TelemetryAnalyzer.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38021c517d8c8a8db8b96c0edd0befd4fd551eb8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+994d8d115879bcfffd158295a2124d83cec82313")]
 [assembly: System.Reflection.AssemblyProductAttribute("TelemetryAnalyzer.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TelemetryAnalyzer.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
