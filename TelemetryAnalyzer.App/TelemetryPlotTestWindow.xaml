@@ -14,10 +14,8 @@
 
     <Window.Resources>
 
-        <!-- ComboBox Item -->
         <Style x:Key="DarkComboBoxItemStyle"
                TargetType="ComboBoxItem">
-
             <Setter Property="Background" Value="#242A33"/>
             <Setter Property="Foreground" Value="#F0F2F5"/>
             <Setter Property="Padding" Value="10,9"/>
@@ -25,7 +23,6 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
 
             <Style.Triggers>
-
                 <Trigger Property="IsHighlighted" Value="True">
                     <Setter Property="Background" Value="#343B46"/>
                     <Setter Property="Foreground" Value="#FF9F43"/>
@@ -39,13 +36,10 @@
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="#626B78"/>
                 </Trigger>
-
             </Style.Triggers>
         </Style>
 
-        <!-- Dark ComboBox -->
         <Style TargetType="ComboBox">
-
             <Setter Property="Height" Value="40"/>
             <Setter Property="Background" Value="#242A33"/>
             <Setter Property="Foreground" Value="#F0F2F5"/>
@@ -59,20 +53,15 @@
 
             <Setter Property="Template">
                 <Setter.Value>
-
                     <ControlTemplate TargetType="ComboBox">
-
                         <Grid>
-
                             <Border x:Name="ComboBorder"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="5"/>
 
-                            <!-- Selected item and arrow -->
                             <Grid IsHitTestVisible="False">
-
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="32"/>
@@ -91,10 +80,8 @@
                                            Foreground="#9299A5"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
-
                             </Grid>
 
-                            <!-- Entire ComboBox clickable -->
                             <ToggleButton Background="Transparent"
                                           BorderThickness="0"
                                           Focusable="False"
@@ -102,7 +89,6 @@
                                           ClickMode="Press"
                                           Opacity="0"/>
 
-                            <!-- Dropdown popup -->
                             <Popup x:Name="PART_Popup"
                                    Placement="Bottom"
                                    PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
@@ -120,20 +106,14 @@
 
                                     <ScrollViewer MaxHeight="260"
                                                   SnapsToDevicePixels="True">
-
                                         <ItemsPresenter
                                             KeyboardNavigation.DirectionalNavigation="Contained"/>
-
                                     </ScrollViewer>
-
                                 </Border>
-
                             </Popup>
-
                         </Grid>
 
                         <ControlTemplate.Triggers>
-
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ComboBorder"
                                         Property="BorderBrush"
@@ -149,20 +129,15 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.5"/>
                             </Trigger>
-
                         </ControlTemplate.Triggers>
-
                     </ControlTemplate>
-
                 </Setter.Value>
             </Setter>
-
         </Style>
 
     </Window.Resources>
 
     <Grid Margin="22">
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -172,7 +147,6 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-
             <TextBlock Text="TELEMETRY STUDIO"
                        FontSize="25"
                        FontWeight="Bold"
@@ -182,7 +156,6 @@
                        FontSize="13"
                        Foreground="#9299A5"
                        Margin="0,6,0,0"/>
-
         </StackPanel>
 
         <!-- Controls -->
@@ -195,7 +168,6 @@
                 Margin="0,0,0,16">
 
             <Grid>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="2*"/>
@@ -214,7 +186,6 @@
 
                 <ComboBox x:Name="SessionComboBox"
                           Grid.Column="1"
-                          Height="40"
                           Margin="0,0,18,0"
                           MinWidth="0"
                           DisplayMemberPath="Name"
@@ -228,7 +199,6 @@
 
                 <ComboBox x:Name="DisplayModeComboBox"
                           Grid.Column="3"
-                          Height="40"
                           Margin="0,0,18,0"
                           MinWidth="0"
                           SelectionChanged="DisplayModeComboBox_SelectionChanged"/>
@@ -241,23 +211,32 @@
 
                 <ComboBox x:Name="ChannelComboBox"
                           Grid.Column="5"
-                          Height="40"
                           Margin="0,0,18,0"
                           MinWidth="0"
                           SelectionChanged="ChannelComboBox_SelectionChanged"/>
 
-                <Button Grid.Column="6"
-                        Content="Refresh"
-                        Click="Refresh_Click"
-                        Padding="20,8"
-                        Background="#FF9F43"
-                        Foreground="#111318"
-                        FontWeight="SemiBold"
-                        BorderThickness="0"
-                        Cursor="Hand"/>
+                <StackPanel Grid.Column="6"
+                            Orientation="Horizontal">
 
+                    <Button Content="Reset Zoom"
+                            Click="ResetZoom_Click"
+                            Padding="14,8"
+                            Margin="0,0,8,0"
+                            Background="#343B46"
+                            Foreground="#F0F2F5"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+
+                    <Button Content="Refresh"
+                            Click="Refresh_Click"
+                            Padding="20,8"
+                            Background="#FF9F43"
+                            Foreground="#111318"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                </StackPanel>
             </Grid>
-
         </Border>
 
         <!-- Single Channel View -->
@@ -270,7 +249,6 @@
                 Padding="14">
 
             <Grid>
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -286,10 +264,11 @@
                            Margin="4,0,0,12"/>
 
                 <ScottPlot:WpfPlot x:Name="SingleTelemetryPlot"
-                                   Grid.Row="1"/>
+                                   Grid.Row="1"
+                                   MouseMove="TelemetryPlot_MouseMove"
+                                   MouseLeave="TelemetryPlot_MouseLeave"/>
 
                 <Grid Grid.Row="2" Margin="0,12,0,0">
-
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -301,7 +280,6 @@
                         <TextBlock Text="MIN"
                                    Foreground="#9299A5"
                                    FontSize="10"/>
-
                         <TextBlock x:Name="SingleMinText"
                                    Text="--"
                                    FontSize="17"
@@ -312,7 +290,6 @@
                         <TextBlock Text="MAX"
                                    Foreground="#9299A5"
                                    FontSize="10"/>
-
                         <TextBlock x:Name="SingleMaxText"
                                    Text="--"
                                    FontSize="17"
@@ -323,7 +300,6 @@
                         <TextBlock Text="AVERAGE"
                                    Foreground="#9299A5"
                                    FontSize="10"/>
-
                         <TextBlock x:Name="SingleAverageText"
                                    Text="--"
                                    FontSize="17"
@@ -334,17 +310,13 @@
                         <TextBlock Text="POINTS"
                                    Foreground="#9299A5"
                                    FontSize="10"/>
-
                         <TextBlock x:Name="SinglePointsText"
                                    Text="--"
                                    FontSize="17"
                                    FontWeight="SemiBold"/>
                     </StackPanel>
-
                 </Grid>
-
             </Grid>
-
         </Border>
 
         <!-- Multi Channel View -->
@@ -355,7 +327,6 @@
                       Visibility="Collapsed">
 
             <Grid>
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -377,7 +348,6 @@
                         Margin="0,0,8,8">
 
                     <Grid>
-
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="220"/>
@@ -391,7 +361,9 @@
                                    Margin="4,0,0,8"/>
 
                         <ScottPlot:WpfPlot x:Name="SpeedPlot"
-                                           Grid.Row="1"/>
+                                           Grid.Row="1"
+                                           MouseMove="TelemetryPlot_MouseMove"
+                                           MouseLeave="TelemetryPlot_MouseLeave"/>
 
                         <TextBlock x:Name="SpeedStatsText"
                                    Grid.Row="2"
@@ -399,9 +371,7 @@
                                    Foreground="#9299A5"
                                    FontSize="11"
                                    Margin="4,8,0,0"/>
-
                     </Grid>
-
                 </Border>
 
                 <!-- RPM -->
@@ -415,7 +385,6 @@
                         Margin="8,0,0,8">
 
                     <Grid>
-
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="220"/>
@@ -429,7 +398,9 @@
                                    Margin="4,0,0,8"/>
 
                         <ScottPlot:WpfPlot x:Name="RpmPlot"
-                                           Grid.Row="1"/>
+                                           Grid.Row="1"
+                                           MouseMove="TelemetryPlot_MouseMove"
+                                           MouseLeave="TelemetryPlot_MouseLeave"/>
 
                         <TextBlock x:Name="RpmStatsText"
                                    Grid.Row="2"
@@ -437,9 +408,7 @@
                                    Foreground="#9299A5"
                                    FontSize="11"
                                    Margin="4,8,0,0"/>
-
                     </Grid>
-
                 </Border>
 
                 <!-- Throttle -->
@@ -453,7 +422,6 @@
                         Margin="0,8,8,0">
 
                     <Grid>
-
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="220"/>
@@ -467,7 +435,9 @@
                                    Margin="4,0,0,8"/>
 
                         <ScottPlot:WpfPlot x:Name="ThrottlePlot"
-                                           Grid.Row="1"/>
+                                           Grid.Row="1"
+                                           MouseMove="TelemetryPlot_MouseMove"
+                                           MouseLeave="TelemetryPlot_MouseLeave"/>
 
                         <TextBlock x:Name="ThrottleStatsText"
                                    Grid.Row="2"
@@ -475,9 +445,7 @@
                                    Foreground="#9299A5"
                                    FontSize="11"
                                    Margin="4,8,0,0"/>
-
                     </Grid>
-
                 </Border>
 
                 <!-- Brake -->
@@ -491,7 +459,6 @@
                         Margin="8,8,0,0">
 
                     <Grid>
-
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="220"/>
@@ -505,7 +472,9 @@
                                    Margin="4,0,0,8"/>
 
                         <ScottPlot:WpfPlot x:Name="BrakePlot"
-                                           Grid.Row="1"/>
+                                           Grid.Row="1"
+                                           MouseMove="TelemetryPlot_MouseMove"
+                                           MouseLeave="TelemetryPlot_MouseLeave"/>
 
                         <TextBlock x:Name="BrakeStatsText"
                                    Grid.Row="2"
@@ -513,24 +482,41 @@
                                    Foreground="#9299A5"
                                    FontSize="11"
                                    Margin="4,8,0,0"/>
-
                     </Grid>
-
                 </Border>
-
             </Grid>
-
         </ScrollViewer>
 
         <!-- Status -->
-        <TextBlock x:Name="StatusText"
-                   Grid.Row="3"
-                   Text="Loading telemetry sessions..."
-                   Foreground="#9299A5"
-                   FontSize="12"
-                   TextWrapping="Wrap"
-                   Margin="2,12,2,0"/>
+        <Border Grid.Row="3"
+                Background="#1A1E25"
+                CornerRadius="6"
+                Padding="10"
+                Margin="0,12,0,0">
 
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="StatusText"
+                           Grid.Column="0"
+                           Text="Loading telemetry sessions..."
+                           Foreground="#9299A5"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"/>
+
+                <TextBlock x:Name="CursorValueText"
+                           Grid.Column="1"
+                           Text="X: -- | Y: --"
+                           Foreground="#FF9F43"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="12,0,4,0"/>
+            </Grid>
+        </Border>
     </Grid>
-
 </Window>

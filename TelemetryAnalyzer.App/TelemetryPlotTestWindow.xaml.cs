@@ -1,13 +1,26 @@
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TelemetryAnalyzer.App.Models;
+using ScottPlot.Plottables;
 
 namespace TelemetryAnalyzer.App;
 
 public partial class TelemetryPlotTestWindow : Window
 {
+    private VerticalLine? _singleCursorLine;
+    private VerticalLine? _speedCursorLine;
+    private VerticalLine? _rpmCursorLine;
+    private VerticalLine? _throttleCursorLine;
+    private VerticalLine? _brakeCursorLine;
+
+    private static readonly ScottPlot.Color CursorColor =
+        ScottPlot.Color.FromHex("#FF9F43");
+
     public TelemetryPlotTestWindow()
     {
         InitializeComponent();
@@ -84,7 +97,41 @@ public partial class TelemetryPlotTestWindow : Window
 
     private void Refresh_Click(object sender, RoutedEventArgs e)
     {
+        int? selectedSessionId =
+            (SessionComboBox.SelectedItem as TelemetrySession)?.Id;
+
         LoadSessions();
+
+        if (selectedSessionId.HasValue &&
+            SessionComboBox.ItemsSource is IEnumerable<TelemetrySession> sessions)
+        {
+            TelemetrySession? existingSession =
+                sessions.FirstOrDefault(session =>
+                    session.Id == selectedSessionId.Value);
+
+            if (existingSession is not null)
+                SessionComboBox.SelectedItem = existingSession;
+        }
+
+        DrawTelemetry();
+    }
+
+    private void ResetZoom_Click(object sender, RoutedEventArgs e)
+    {
+        SingleTelemetryPlot.Plot.Axes.AutoScale();
+        SpeedPlot.Plot.Axes.AutoScale();
+        RpmPlot.Plot.Axes.AutoScale();
+        ThrottlePlot.Plot.Axes.AutoScale();
+        BrakePlot.Plot.Axes.AutoScale();
+
+        SingleTelemetryPlot.Refresh();
+        SpeedPlot.Refresh();
+        RpmPlot.Refresh();
+        ThrottlePlot.Refresh();
+        BrakePlot.Refresh();
+
+        CursorValueText.Text = "X: -- | Y: --";
+        StatusText.Text = "Chart zoom has been reset.";
     }
 
     private void UpdateDisplayMode()
@@ -105,6 +152,8 @@ public partial class TelemetryPlotTestWindow : Window
     {
         if (SessionComboBox.SelectedItem is not TelemetrySession session)
             return;
+
+        CursorValueText.Text = "X: -- | Y: --";
 
         if (DisplayModeComboBox.SelectedItem as string == "Multi Channel")
         {
@@ -127,6 +176,7 @@ public partial class TelemetryPlotTestWindow : Window
             .ToList();
 
         SingleTelemetryPlot.Plot.Clear();
+        _singleCursorLine = null;
 
         if (records.Count == 0)
         {
@@ -141,7 +191,7 @@ public partial class TelemetryPlotTestWindow : Window
             return;
         }
 
-        var xValues = GetXValues(records);
+        double[] xValues = GetXValues(records);
 
         double[] yValues = records
             .Select(record => GetValue(record, channel)!.Value)
@@ -175,29 +225,10 @@ public partial class TelemetryPlotTestWindow : Window
             .OrderBy(record => record.Index)
             .ToList();
 
-        DrawChannel(
-            SpeedPlot,
-            SpeedStatsText,
-            records,
-            "Speed");
-
-        DrawChannel(
-            RpmPlot,
-            RpmStatsText,
-            records,
-            "RPM");
-
-        DrawChannel(
-            ThrottlePlot,
-            ThrottleStatsText,
-            records,
-            "Throttle");
-
-        DrawChannel(
-            BrakePlot,
-            BrakeStatsText,
-            records,
-            "Brake");
+        DrawChannel(SpeedPlot, SpeedStatsText, records, "Speed");
+        DrawChannel(RpmPlot, RpmStatsText, records, "RPM");
+        DrawChannel(ThrottlePlot, ThrottleStatsText, records, "Throttle");
+        DrawChannel(BrakePlot, BrakeStatsText, records, "Brake");
 
         StatusText.Text =
             $"Session: {session.Name} | Displaying four telemetry channels";
@@ -206,7 +237,7 @@ public partial class TelemetryPlotTestWindow : Window
     private void DrawChannel(
         ScottPlot.WPF.WpfPlot plot,
         TextBlock statsText,
-        System.Collections.Generic.List<TelemetryRecord> records,
+        List<TelemetryRecord> records,
         string channel)
     {
         var validRecords = records
@@ -214,6 +245,7 @@ public partial class TelemetryPlotTestWindow : Window
             .ToList();
 
         plot.Plot.Clear();
+        ResetCursorReference(plot);
 
         if (validRecords.Count == 0)
         {
@@ -244,8 +276,163 @@ public partial class TelemetryPlotTestWindow : Window
             $"Avg: {yValues.Average():F2}";
     }
 
+    private void TelemetryPlot_MouseMove(
+        object sender,
+        MouseEventArgs e)
+    {
+        if (sender is not ScottPlot.WPF.WpfPlot plot)
+            return;
+
+        if (SessionComboBox.SelectedItem is not TelemetrySession session)
+            return;
+
+        string channel;
+
+        if (plot == SingleTelemetryPlot)
+            channel = ChannelComboBox.SelectedItem as string ?? "Speed";
+        else if (plot == SpeedPlot)
+            channel = "Speed";
+        else if (plot == RpmPlot)
+            channel = "RPM";
+        else if (plot == ThrottlePlot)
+            channel = "Throttle";
+        else if (plot == BrakePlot)
+            channel = "Brake";
+        else
+            return;
+
+        var records = session.Records
+            .Where(record => GetValue(record, channel).HasValue)
+            .OrderBy(record => record.Index)
+            .ToList();
+
+        if (records.Count == 0)
+            return;
+
+        Point mousePosition = e.GetPosition(plot);
+
+        ScottPlot.Pixel pixel = new(
+            (int)mousePosition.X,
+            (int)mousePosition.Y);
+
+        ScottPlot.Coordinates coordinates =
+            plot.Plot.GetCoordinates(pixel);
+
+        bool hasTime = records.All(record => record.Time.HasValue);
+
+        TelemetryRecord? nearestRecord = records.MinBy(record =>
+        {
+            double x = hasTime
+                ? record.Time!.Value
+                : record.Index;
+
+            return Math.Abs(x - coordinates.X);
+        });
+
+        if (nearestRecord is null)
+            return;
+
+        double xValue = hasTime
+            ? nearestRecord.Time!.Value
+            : nearestRecord.Index;
+
+        double? yValue = GetValue(nearestRecord, channel);
+
+        if (!yValue.HasValue)
+            return;
+
+        UpdateCursorLine(plot, xValue);
+
+        string xLabel = hasTime ? "Time" : "Index";
+
+        CursorValueText.Text =
+            $"{xLabel}: {xValue:F3} | {channel}: {yValue.Value:F2}";
+
+        plot.Refresh();
+    }
+
+    private void UpdateCursorLine(
+        ScottPlot.WPF.WpfPlot plot,
+        double xValue)
+    {
+        VerticalLine? cursorLine = GetCursorLine(plot);
+
+        if (cursorLine is null)
+        {
+            cursorLine = plot.Plot.Add.VerticalLine(xValue);
+
+            cursorLine.LineWidth = 2;
+            cursorLine.Color = CursorColor;
+
+            SetCursorLine(plot, cursorLine);
+        }
+        else
+        {
+            cursorLine.X = xValue;
+        }
+    }
+
+    private VerticalLine? GetCursorLine(
+        ScottPlot.WPF.WpfPlot plot)
+    {
+        if (plot == SingleTelemetryPlot)
+            return _singleCursorLine;
+
+        if (plot == SpeedPlot)
+            return _speedCursorLine;
+
+        if (plot == RpmPlot)
+            return _rpmCursorLine;
+
+        if (plot == ThrottlePlot)
+            return _throttleCursorLine;
+
+        if (plot == BrakePlot)
+            return _brakeCursorLine;
+
+        return null;
+    }
+
+    private void SetCursorLine(
+        ScottPlot.WPF.WpfPlot plot,
+        VerticalLine cursorLine)
+    {
+        if (plot == SingleTelemetryPlot)
+            _singleCursorLine = cursorLine;
+        else if (plot == SpeedPlot)
+            _speedCursorLine = cursorLine;
+        else if (plot == RpmPlot)
+            _rpmCursorLine = cursorLine;
+        else if (plot == ThrottlePlot)
+            _throttleCursorLine = cursorLine;
+        else if (plot == BrakePlot)
+            _brakeCursorLine = cursorLine;
+    }
+
+    private void ResetCursorReference(
+        ScottPlot.WPF.WpfPlot plot)
+    {
+        if (plot == SingleTelemetryPlot)
+            _singleCursorLine = null;
+        else if (plot == SpeedPlot)
+            _speedCursorLine = null;
+        else if (plot == RpmPlot)
+            _rpmCursorLine = null;
+        else if (plot == ThrottlePlot)
+            _throttleCursorLine = null;
+        else if (plot == BrakePlot)
+            _brakeCursorLine = null;
+    }
+
+    private void TelemetryPlot_MouseLeave(
+        object sender,
+        MouseEventArgs e)
+    {
+        CursorValueText.Text = "X: -- | Y: --";
+    }
+
     private static double[] GetXValues(
-        System.Collections.Generic.List<TelemetryRecord> records)
+        List<TelemetryRecord> records)
     {
         bool hasTime = records.All(record => record.Time.HasValue);
 
@@ -255,7 +442,7 @@ public partial class TelemetryPlotTestWindow : Window
     }
 
     private static string GetXAxisLabel(
-        System.Collections.Generic.List<TelemetryRecord> records)
+        List<TelemetryRecord> records)
     {
         return records.All(record => record.Time.HasValue)
             ? "Time (s)"
@@ -304,6 +491,12 @@ public partial class TelemetryPlotTestWindow : Window
         ThrottlePlot.Plot.Clear();
         BrakePlot.Plot.Clear();
 
+        _singleCursorLine = null;
+        _speedCursorLine = null;
+        _rpmCursorLine = null;
+        _throttleCursorLine = null;
+        _brakeCursorLine = null;
+
         SingleTelemetryPlot.Refresh();
         SpeedPlot.Refresh();
         RpmPlot.Refresh();
@@ -316,5 +509,7 @@ public partial class TelemetryPlotTestWindow : Window
         RpmStatsText.Text = "--";
         ThrottleStatsText.Text = "--";
         BrakeStatsText.Text = "--";
+
+        CursorValueText.Text = "X: -- | Y: --";
     }
 }

@@ -25,7 +25,6 @@
             <Setter Property="Margin" Value="0,0,12,12"/>
         </Style>
 
-        <!-- TextBox -->
         <Style TargetType="TextBox">
             <Setter Property="Width" Value="75"/>
             <Setter Property="Height" Value="34"/>
@@ -36,7 +35,6 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
-        <!-- ComboBox Item -->
         <Style x:Key="DarkComboBoxItemStyle"
                TargetType="ComboBoxItem">
 
@@ -65,7 +63,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Dark ComboBox -->
         <Style TargetType="ComboBox">
 
             <Setter Property="MinWidth" Value="150"/>
@@ -93,7 +90,6 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="5"/>
 
-                            <!-- Visible content -->
                             <Grid IsHitTestVisible="False">
 
                                 <Grid.ColumnDefinitions>
@@ -117,7 +113,6 @@
 
                             </Grid>
 
-                            <!-- Clickable area covering the entire ComboBox -->
                             <ToggleButton Background="Transparent"
                                           BorderThickness="0"
                                           Focusable="False"
@@ -125,7 +120,6 @@
                                           ClickMode="Press"
                                           Opacity="0"/>
 
-                            <!-- Dropdown -->
                             <Popup x:Name="PART_Popup"
                                    Placement="Bottom"
                                    PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
@@ -219,7 +213,6 @@
 
             <StackPanel>
 
-                <!-- Configuration header -->
                 <Grid Margin="0,0,0,18">
 
                     <Grid.ColumnDefinitions>
@@ -286,9 +279,17 @@
                                    Margin="0,0,0,8"/>
 
                         <ComboBox x:Name="SessionComboBox"
-                                  DisplayMemberPath="Name"
                                   SelectionChanged="Selection_Changed"
-                                  MinWidth="0"/>
+                                  MinWidth="0">
+
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="#F0F2F5"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+
+                        </ComboBox>
 
                     </StackPanel>
 

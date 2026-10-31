@@ -234,14 +234,12 @@ D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\bin\Debug\net10.0-win
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TelemetryAnalyzer.App.csproj.AssemblyReference.cache
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\CsvImportWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\MainWindow.baml
-D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\RaceReplayWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\SignalAnalysisWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TelemetryAnalysisWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TelemetryPlotTestWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TrackVisualizationWindow.baml
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\CsvImportWindow.g.cs
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\MainWindow.g.cs
-D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\RaceReplayWindow.g.cs
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\SignalAnalysisWindow.g.cs
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TelemetryAnalysisWindow.g.cs
 D:\programs\GitHub\TelemetryAnalyzer\TelemetryAnalyzer.App\obj\Debug\net10.0-windows10.0.19041\TelemetryPlotTestWindow.g.cs
