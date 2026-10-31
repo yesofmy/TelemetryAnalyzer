@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -36,18 +35,6 @@ public partial class MainWindow : Window
 
     private static readonly SolidColorBrush GreenBrush =
         new(Color.FromRgb(85, 214, 160));
-    
-    private void RaceReplay_Click(
-        object sender,
-        System.Windows.RoutedEventArgs e)
-    {
-        RaceReplayWindow window = new()
-        {
-            Owner = this
-        };
-
-        window.ShowDialog();
-    }
 
     public MainWindow()
     {

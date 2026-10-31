@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "aJhkeORULfk=",
+  "dgSpecHash": "6oJV1s6c2sA=",
   "success": true,
-  "projectFilePath": "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.App\\TelemetryAnalyzer.App.csproj",
+  "projectFilePath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.App\\TelemetryAnalyzer.App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Vlad\\.nuget\\packages\\harfbuzzsharp\\8.3.1.1\\harfbuzzsharp.8.3.1.1.nupkg.sha512",
     "C:\\Users\\Vlad\\.nuget\\packages\\harfbuzzsharp.nativeassets.linux\\8.3.1.1\\harfbuzzsharp.nativeassets.linux.8.3.1.1.nupkg.sha512",

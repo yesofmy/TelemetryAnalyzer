@@ -2,17 +2,192 @@
 <Window x:Class="TelemetryAnalyzer.App.SignalAnalysisWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        xmlns:scottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
         Title="Signal Analysis"
-        Width="1150"
-        Height="760"
-        MinWidth="850"
-        MinHeight="600"
+        Height="900"
+        Width="1250"
+        MinHeight="700"
+        MinWidth="950"
+        WindowStartupLocation="CenterScreen"
         Background="#111318"
         Foreground="#F0F2F5">
 
-    <Grid Margin="20">
+    <Window.Resources>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#F0F2F5"/>
+        </Style>
+
+        <Style x:Key="PanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1A1E25"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,12,12"/>
+        </Style>
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Width" Value="75"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Background" Value="#242A33"/>
+            <Setter Property="Foreground" Value="#F0F2F5"/>
+            <Setter Property="BorderBrush" Value="#343B46"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- ComboBox Item -->
+        <Style x:Key="DarkComboBoxItemStyle"
+               TargetType="ComboBoxItem">
+
+            <Setter Property="Background" Value="#242A33"/>
+            <Setter Property="Foreground" Value="#F0F2F5"/>
+            <Setter Property="Padding" Value="10,9"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+
+            <Style.Triggers>
+
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#343B46"/>
+                    <Setter Property="Foreground" Value="#FF9F43"/>
+                </Trigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#343B46"/>
+                    <Setter Property="Foreground" Value="#FF9F43"/>
+                </Trigger>
+
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="#626B78"/>
+                </Trigger>
+
+            </Style.Triggers>
+        </Style>
+
+        <!-- Dark ComboBox -->
+        <Style TargetType="ComboBox">
+
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="#242A33"/>
+            <Setter Property="Foreground" Value="#F0F2F5"/>
+            <Setter Property="BorderBrush" Value="#343B46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ItemContainerStyle"
+                    Value="{StaticResource DarkComboBoxItemStyle}"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="ComboBox">
+
+                        <Grid>
+
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5"/>
+
+                            <!-- Visible content -->
+                            <Grid IsHitTestVisible="False">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="32"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter Grid.Column="0"
+                                                  Margin="10,0,0,0"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Left"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="⌄"
+                                           FontSize="15"
+                                           Foreground="#9299A5"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+
+                            </Grid>
+
+                            <!-- Clickable area covering the entire ComboBox -->
+                            <ToggleButton Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press"
+                                          Opacity="0"/>
+
+                            <!-- Dropdown -->
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade">
+
+                                <Border Background="#242A33"
+                                        BorderBrush="#343B46"
+                                        BorderThickness="1"
+                                        CornerRadius="5"
+                                        Margin="0,4,0,0"
+                                        MinWidth="{Binding PlacementTarget.ActualWidth, RelativeSource={RelativeSource AncestorType=Popup}}">
+
+                                    <ScrollViewer MaxHeight="260"
+                                                  SnapsToDevicePixels="True">
+
+                                        <ItemsPresenter
+                                            KeyboardNavigation.DirectionalNavigation="Contained"/>
+
+                                    </ScrollViewer>
+
+                                </Border>
+
+                            </Popup>
+
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ComboBorder"
+                                        Property="BorderBrush"
+                                        Value="#FF9F43"/>
+                            </Trigger>
+
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ComboBorder"
+                                        Property="BorderBrush"
+                                        Value="#FF9F43"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="22">
+
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -20,120 +195,448 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <TextBlock Text="SIGNAL ANALYSIS"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="#FF9F43"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
 
-            <TextBlock Text="Moving Average filter and signal comparison"
-                       FontSize="13"
+            <TextBlock Text="Signal Analysis"
+                       FontSize="27"
+                       FontWeight="SemiBold"/>
+
+            <TextBlock Text="Apply moving average filters and compare their results"
                        Foreground="#9299A5"
-                       Margin="0,6,0,0"/>
+                       FontSize="13"
+                       Margin="0,5,0,0"/>
+
         </StackPanel>
 
-        <!-- Analysis controls -->
+        <!-- Analysis Configuration -->
         <Border Grid.Row="1"
                 Background="#1A1E25"
-                BorderBrush="#303641"
+                BorderBrush="#2B323D"
                 BorderThickness="1"
                 CornerRadius="10"
-                Padding="14"
+                Padding="20"
                 Margin="0,0,0,16">
 
-            <WrapPanel VerticalAlignment="Center">
+            <StackPanel>
 
-                <!-- Session -->
-                <StackPanel Width="190"
-                            Margin="0,0,14,8">
-                    <TextBlock Text="Session"
-                               Foreground="#9299A5"
-                               Margin="0,0,0,6"/>
+                <!-- Configuration header -->
+                <Grid Margin="0,0,0,18">
 
-                    <ComboBox x:Name="SessionComboBox"
-                              Height="34"
-                              DisplayMemberPath="Name"
-                              SelectionChanged="Selection_Changed"/>
-                </StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Channel -->
-                <StackPanel Width="130"
-                            Margin="0,0,14,8">
-                    <TextBlock Text="Channel"
-                               Foreground="#9299A5"
-                               Margin="0,0,0,6"/>
+                    <StackPanel>
 
-                    <ComboBox x:Name="ChannelComboBox"
-                              Height="34"
-                              SelectionChanged="Selection_Changed"/>
-                </StackPanel>
+                        <TextBlock Text="Analysis Configuration"
+                                   FontSize="17"
+                                   FontWeight="SemiBold"/>
 
-                <!-- Window size -->
-                <StackPanel Width="120"
-                            Margin="0,0,14,8">
-                    <TextBlock Text="Window size"
-                               Foreground="#9299A5"
-                               Margin="0,0,0,6"/>
+                        <TextBlock Text="Configure telemetry data and filtering parameters"
+                                   Foreground="#9299A5"
+                                   FontSize="12"
+                                   Margin="0,5,0,0"/>
 
-                    <TextBox x:Name="WindowSizeTextBox"
-                             Text="5"
-                             Height="34"
-                             Padding="8,5"
-                             VerticalContentAlignment="Center"/>
-                </StackPanel>
+                    </StackPanel>
 
-                <!-- Algorithm -->
-                <StackPanel Width="240"
-                            Margin="0,0,14,8">
-                    <TextBlock Text="Filtering Algorithm"
-                               Foreground="#9299A5"
-                               Margin="0,0,0,6"/>
+                    <Border Grid.Column="1"
+                            Background="#242A33"
+                            CornerRadius="5"
+                            Padding="10,5"
+                            VerticalAlignment="Center">
 
-                    <ComboBox x:Name="AlgorithmComboBox"
-                              Height="34"
-                              HorizontalAlignment="Stretch"
-                              SelectionChanged="Selection_Changed"/>
-                </StackPanel>
+                        <StackPanel Orientation="Horizontal">
 
-                <!-- Apply filter button -->
-                <StackPanel VerticalAlignment="Bottom"
-                            Margin="0,0,0,8">
+                            <Ellipse Width="7"
+                                     Height="7"
+                                     Fill="#FF9F43"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,7,0"/>
 
-                    <Button Content="▶  Apply filter"
+                            <TextBlock Text="READY"
+                                       Foreground="#FF9F43"
+                                       FontSize="10"
+                                       FontWeight="Bold"/>
+
+                        </StackPanel>
+
+                    </Border>
+
+                </Grid>
+
+                <!-- Configuration fields -->
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Session -->
+                    <StackPanel Grid.Column="0"
+                                Margin="0,0,12,0">
+
+                        <TextBlock Text="TELEMETRY SESSION"
+                                   Foreground="#9299A5"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"/>
+
+                        <ComboBox x:Name="SessionComboBox"
+                                  DisplayMemberPath="Name"
+                                  SelectionChanged="Selection_Changed"
+                                  MinWidth="0"/>
+
+                    </StackPanel>
+
+                    <!-- Channel -->
+                    <StackPanel Grid.Column="1"
+                                Margin="0,0,12,0">
+
+                        <TextBlock Text="SIGNAL CHANNEL"
+                                   Foreground="#9299A5"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"/>
+
+                        <ComboBox x:Name="ChannelComboBox"
+                                  SelectionChanged="Selection_Changed"
+                                  MinWidth="0"/>
+
+                    </StackPanel>
+
+                    <!-- Window size -->
+                    <StackPanel Grid.Column="2"
+                                Margin="0,0,12,0">
+
+                        <TextBlock Text="WINDOW SIZE"
+                                   Foreground="#9299A5"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"/>
+
+                        <Border Background="#242A33"
+                                BorderBrush="#343B46"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Height="40">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox x:Name="WindowSizeTextBox"
+                                         Text="5"
+                                         Width="Auto"
+                                         Height="38"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         Padding="10,5"
+                                         VerticalContentAlignment="Center"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="samples"
+                                           Foreground="#9299A5"
+                                           FontSize="10"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
+
+                            </Grid>
+
+                        </Border>
+
+                    </StackPanel>
+
+                    <!-- Algorithm -->
+                    <StackPanel Grid.Column="3">
+
+                        <TextBlock Text="FILTER ALGORITHM"
+                                   Foreground="#9299A5"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"/>
+
+                        <ComboBox x:Name="AlgorithmComboBox"
+                                  SelectionChanged="Selection_Changed"
+                                  MinWidth="0"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Action area -->
+                <Grid Margin="0,18,0,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+
+                        <TextBlock Text="Moving Average Filter"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+
+                        <TextBlock Text="Compare the original signal with the filtered output"
+                                   Foreground="#9299A5"
+                                   FontSize="11"
+                                   Margin="0,3,0,0"/>
+
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Content="▶  Run Analysis"
                             Click="ApplyFilter_Click"
-                            Height="36"
-                            MinWidth="145"
-                            Padding="18,5"
+                            Height="42"
+                            MinWidth="155"
+                            Padding="16,0"
                             Background="#FF9F43"
                             Foreground="#111318"
+                            FontSize="12"
                             FontWeight="Bold"
-                            FontSize="13"
                             BorderThickness="0"
                             Cursor="Hand"/>
+
+                </Grid>
+
+            </StackPanel>
+
+        </Border>
+
+        <!-- Statistics -->
+        <Grid Grid.Row="2" Margin="0,0,0,2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+
+                    <TextBlock Text="Samples"
+                               Foreground="#9299A5"
+                               FontSize="12"/>
+
+                    <TextBlock x:Name="SampleCountText"
+                               Text="—"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               Margin="0,5,0,0"/>
+
+                    <TextBlock Text="Processed values"
+                               Foreground="#9299A5"
+                               FontSize="11"/>
+
                 </StackPanel>
+            </Border>
 
-            </WrapPanel>
-        </Border>
+            <Border Grid.Column="1" Style="{StaticResource PanelStyle}">
+                <StackPanel>
 
-        <!-- Signal plot -->
-        <Border Grid.Row="2"
-                Background="#1A1E25"
-                BorderBrush="#303641"
-                BorderThickness="1"
-                CornerRadius="10"
-                Padding="12">
+                    <TextBlock Text="Naive algorithm"
+                               Foreground="#9299A5"
+                               FontSize="12"/>
 
-            <ScottPlot:WpfPlot x:Name="AnalysisPlot"/>
-        </Border>
+                    <TextBlock x:Name="NaiveTimeText"
+                               Text="—"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               Margin="0,5,0,0"/>
+
+                    <TextBlock Text="Average execution time"
+                               Foreground="#9299A5"
+                               FontSize="11"/>
+
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+
+                    <TextBlock Text="Optimized algorithm"
+                               Foreground="#9299A5"
+                               FontSize="12"/>
+
+                    <TextBlock x:Name="OptimizedTimeText"
+                               Text="—"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               Margin="0,5,0,0"/>
+
+                    <TextBlock Text="Average execution time"
+                               Foreground="#9299A5"
+                               FontSize="11"/>
+
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+
+                    <TextBlock Text="Speedup"
+                               Foreground="#9299A5"
+                               FontSize="12"/>
+
+                    <TextBlock x:Name="SpeedupText"
+                               Text="—"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               Margin="0,5,0,0"/>
+
+                    <TextBlock Text="Naive / optimized"
+                               Foreground="#9299A5"
+                               FontSize="11"/>
+
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+        <!-- Charts -->
+        <ScrollViewer Grid.Row="3"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <StackPanel>
+
+                <!-- Original signal -->
+                <Border Background="#1A1E25"
+                        CornerRadius="8"
+                        Padding="12"
+                        Margin="0,0,0,12">
+
+                    <StackPanel>
+
+                        <TextBlock Text="Original Signal"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="4,0,0,8"/>
+
+                        <scottPlot:WpfPlot x:Name="OriginalPlot"
+                                           Height="260"/>
+
+                    </StackPanel>
+
+                </Border>
+
+                <!-- Filtered signal -->
+                <Border Background="#1A1E25"
+                        CornerRadius="8"
+                        Padding="12"
+                        Margin="0,0,0,12">
+
+                    <StackPanel>
+
+                        <TextBlock Text="Filtered Signal"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="4,0,0,8"/>
+
+                        <scottPlot:WpfPlot x:Name="FilteredPlot"
+                                           Height="260"/>
+
+                    </StackPanel>
+
+                </Border>
+
+                <!-- Additional statistics -->
+                <Border Background="#1A1E25"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,12">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+
+                            <TextBlock Text="Maximum error"
+                                       Foreground="#9299A5"
+                                       FontSize="12"/>
+
+                            <TextBlock x:Name="ErrorText"
+                                       Text="—"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+
+                            <TextBlock Text="Original average"
+                                       Foreground="#9299A5"
+                                       FontSize="12"/>
+
+                            <TextBlock x:Name="OriginalAverageText"
+                                       Text="—"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+
+                            <TextBlock Text="Filtered average"
+                                       Foreground="#9299A5"
+                                       FontSize="12"/>
+
+                            <TextBlock x:Name="FilteredAverageText"
+                                       Text="—"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+
+                            <TextBlock Text="Window size"
+                                       Foreground="#9299A5"
+                                       FontSize="12"/>
+
+                            <TextBlock x:Name="AppliedWindowText"
+                                       Text="—"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
+
+            </StackPanel>
+
+        </ScrollViewer>
 
         <!-- Status -->
         <TextBlock x:Name="StatusText"
-                   Grid.Row="3"
-                   Text="Select a session and channel."
+                   Grid.Row="4"
+                   Text="Select a session and channel, then apply a filter."
                    Foreground="#9299A5"
                    FontSize="12"
                    TextWrapping="Wrap"
-                   Margin="2,12,2,0"/>
+                   Margin="0,8,0,0"/>
 
     </Grid>
+
 </Window>

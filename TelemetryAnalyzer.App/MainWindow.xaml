@@ -1,5 +1,4 @@
-﻿
-<Window x:Class="TelemetryAnalyzer.App.MainWindow"
+﻿<Window x:Class="TelemetryAnalyzer.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Telemetry Analyzer"
@@ -224,10 +223,6 @@
                                 Content="⚙    Settings"
                                 Style="{StaticResource NavButtonStyle}"
                                 Click="Settings_Click"/>
-                        <Button Content="Race Replay"
-                                Click="RaceReplay_Click"
-                                Margin="8"
-                                Padding="12,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>

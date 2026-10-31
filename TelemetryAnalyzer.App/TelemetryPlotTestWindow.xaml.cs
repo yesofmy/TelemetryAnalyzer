@@ -12,6 +12,14 @@ public partial class TelemetryPlotTestWindow : Window
     {
         InitializeComponent();
 
+        DisplayModeComboBox.ItemsSource = new[]
+        {
+            "Single Channel",
+            "Multi Channel"
+        };
+
+        DisplayModeComboBox.SelectedIndex = 0;
+
         ChannelComboBox.ItemsSource = new[]
         {
             "Speed",
@@ -39,8 +47,7 @@ public partial class TelemetryPlotTestWindow : Window
             }
             else
             {
-                TelemetryPlot.Plot.Clear();
-                TelemetryPlot.Refresh();
+                ClearAllPlots();
 
                 StatusText.Text =
                     "No imported sessions found. Import a CSV file first.";
@@ -57,14 +64,22 @@ public partial class TelemetryPlotTestWindow : Window
         object sender,
         SelectionChangedEventArgs e)
     {
-        DrawSelectedChannel();
+        DrawTelemetry();
+    }
+
+    private void DisplayModeComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        UpdateDisplayMode();
+        DrawTelemetry();
     }
 
     private void ChannelComboBox_SelectionChanged(
         object sender,
         SelectionChangedEventArgs e)
     {
-        DrawSelectedChannel();
+        DrawTelemetry();
     }
 
     private void Refresh_Click(object sender, RoutedEventArgs e)
@@ -72,11 +87,37 @@ public partial class TelemetryPlotTestWindow : Window
         LoadSessions();
     }
 
-    private void DrawSelectedChannel()
+    private void UpdateDisplayMode()
+    {
+        bool multiMode =
+            DisplayModeComboBox.SelectedItem as string == "Multi Channel";
+
+        SingleChannelPanel.Visibility =
+            multiMode ? Visibility.Collapsed : Visibility.Visible;
+
+        MultiChannelPanel.Visibility =
+            multiMode ? Visibility.Visible : Visibility.Collapsed;
+
+        ChannelComboBox.IsEnabled = !multiMode;
+    }
+
+    private void DrawTelemetry()
     {
         if (SessionComboBox.SelectedItem is not TelemetrySession session)
             return;
 
+        if (DisplayModeComboBox.SelectedItem as string == "Multi Channel")
+        {
+            DrawMultiChannel(session);
+        }
+        else
+        {
+            DrawSingleChannel(session);
+        }
+    }
+
+    private void DrawSingleChannel(TelemetrySession session)
+    {
         if (ChannelComboBox.SelectedItem is not string channel)
             return;
 
@@ -85,11 +126,14 @@ public partial class TelemetryPlotTestWindow : Window
             .OrderBy(record => record.Index)
             .ToList();
 
-        TelemetryPlot.Plot.Clear();
+        SingleTelemetryPlot.Plot.Clear();
 
         if (records.Count == 0)
         {
-            TelemetryPlot.Refresh();
+            SingleTelemetryPlot.Refresh();
+            ClearSingleStats();
+
+            SingleChartTitle.Text = channel;
 
             StatusText.Text =
                 $"Session: {session.Name} | No valid {channel} values found.";
@@ -97,31 +141,125 @@ public partial class TelemetryPlotTestWindow : Window
             return;
         }
 
-        bool hasTime = records.All(record => record.Time.HasValue);
-
-        double[] xValues = hasTime
-            ? records.Select(record => record.Time!.Value).ToArray()
-            : records.Select(record => (double)record.Index).ToArray();
+        var xValues = GetXValues(records);
 
         double[] yValues = records
             .Select(record => GetValue(record, channel)!.Value)
             .ToArray();
 
-        TelemetryPlot.Plot.Add.Scatter(xValues, yValues);
-        TelemetryPlot.Plot.Title($"{channel} - {session.Name}");
-        TelemetryPlot.Plot.XLabel(
-            hasTime ? "Time (s)" : "Sample index");
-        TelemetryPlot.Plot.YLabel(GetUnit(channel));
-        TelemetryPlot.Plot.Axes.AutoScale();
+        var scatter = SingleTelemetryPlot.Plot.Add.Scatter(xValues, yValues);
+        scatter.LineWidth = 2;
 
-        TelemetryPlot.Refresh();
+        SingleTelemetryPlot.Plot.Title($"{channel} - {session.Name}");
+        SingleTelemetryPlot.Plot.XLabel(GetXAxisLabel(records));
+        SingleTelemetryPlot.Plot.YLabel(GetUnit(channel));
+        SingleTelemetryPlot.Plot.Axes.AutoScale();
+
+        SingleTelemetryPlot.Refresh();
+
+        SingleChartTitle.Text = channel.ToUpperInvariant();
+
+        SingleMinText.Text = yValues.Min().ToString("F2");
+        SingleMaxText.Text = yValues.Max().ToString("F2");
+        SingleAverageText.Text = yValues.Average().ToString("F2");
+        SinglePointsText.Text = yValues.Length.ToString("N0");
 
         StatusText.Text =
             $"Session: {session.Name} | Channel: {channel} | " +
-            $"Points: {yValues.Length:N0} | " +
+            $"Points: {yValues.Length:N0}";
+    }
+
+    private void DrawMultiChannel(TelemetrySession session)
+    {
+        var records = session.Records
+            .OrderBy(record => record.Index)
+            .ToList();
+
+        DrawChannel(
+            SpeedPlot,
+            SpeedStatsText,
+            records,
+            "Speed");
+
+        DrawChannel(
+            RpmPlot,
+            RpmStatsText,
+            records,
+            "RPM");
+
+        DrawChannel(
+            ThrottlePlot,
+            ThrottleStatsText,
+            records,
+            "Throttle");
+
+        DrawChannel(
+            BrakePlot,
+            BrakeStatsText,
+            records,
+            "Brake");
+
+        StatusText.Text =
+            $"Session: {session.Name} | Displaying four telemetry channels";
+    }
+
+    private void DrawChannel(
+        ScottPlot.WPF.WpfPlot plot,
+        TextBlock statsText,
+        System.Collections.Generic.List<TelemetryRecord> records,
+        string channel)
+    {
+        var validRecords = records
+            .Where(record => GetValue(record, channel).HasValue)
+            .ToList();
+
+        plot.Plot.Clear();
+
+        if (validRecords.Count == 0)
+        {
+            plot.Refresh();
+            statsText.Text = "No valid data available";
+            return;
+        }
+
+        double[] xValues = GetXValues(validRecords);
+
+        double[] yValues = validRecords
+            .Select(record => GetValue(record, channel)!.Value)
+            .ToArray();
+
+        var scatter = plot.Plot.Add.Scatter(xValues, yValues);
+        scatter.LineWidth = 2;
+
+        plot.Plot.Title(channel);
+        plot.Plot.XLabel(GetXAxisLabel(validRecords));
+        plot.Plot.YLabel(GetUnit(channel));
+        plot.Plot.Axes.AutoScale();
+
+        plot.Refresh();
+
+        statsText.Text =
             $"Min: {yValues.Min():F2} | " +
             $"Max: {yValues.Max():F2} | " +
-            $"Average: {yValues.Average():F2}";
+            $"Avg: {yValues.Average():F2}";
+    }
+
+    private static double[] GetXValues(
+        System.Collections.Generic.List<TelemetryRecord> records)
+    {
+        bool hasTime = records.All(record => record.Time.HasValue);
+
+        return hasTime
+            ? records.Select(record => record.Time!.Value).ToArray()
+            : records.Select(record => (double)record.Index).ToArray();
+    }
+
+    private static string GetXAxisLabel(
+        System.Collections.Generic.List<TelemetryRecord> records)
+    {
+        return records.All(record => record.Time.HasValue)
+            ? "Time (s)"
+            : "Sample index";
     }
 
     private static double? GetValue(
@@ -142,11 +280,41 @@ public partial class TelemetryPlotTestWindow : Window
     {
         return channel switch
         {
-            "Speed" => "Speed (km/h, if source uses km/h)",
+            "Speed" => "Speed (source units)",
             "RPM" => "Engine speed (RPM)",
             "Throttle" => "Throttle (source units)",
             "Brake" => "Brake (source units)",
             _ => channel
         };
+    }
+
+    private void ClearSingleStats()
+    {
+        SingleMinText.Text = "--";
+        SingleMaxText.Text = "--";
+        SingleAverageText.Text = "--";
+        SinglePointsText.Text = "--";
+    }
+
+    private void ClearAllPlots()
+    {
+        SingleTelemetryPlot.Plot.Clear();
+        SpeedPlot.Plot.Clear();
+        RpmPlot.Plot.Clear();
+        ThrottlePlot.Plot.Clear();
+        BrakePlot.Plot.Clear();
+
+        SingleTelemetryPlot.Refresh();
+        SpeedPlot.Refresh();
+        RpmPlot.Refresh();
+        ThrottlePlot.Refresh();
+        BrakePlot.Refresh();
+
+        ClearSingleStats();
+
+        SpeedStatsText.Text = "--";
+        RpmStatsText.Text = "--";
+        ThrottleStatsText.Text = "--";
+        BrakeStatsText.Text = "--";
     }
 }
