@@ -10,13 +10,41 @@ public sealed class CsvTelemetryImporter
 {
     private const int PreviewLimit = 100;
 
+    private static readonly HashSet<string> SupportedChannels =
+    [
+        "time",
+        "speed",
+        "rpm",
+        "gear",
+        "throttle",
+        "brake",
+        "distance",
+        "latitude",
+        "longitude"
+    ];
+
     public TelemetryImportResult Import(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            throw new ArgumentException(
+                "A file path must be specified.",
+                nameof(filePath));
+        }
+
         if (!File.Exists(filePath))
         {
             throw new FileNotFoundException(
                 "The selected CSV file was not found.",
                 filePath);
+        }
+
+        FileInfo fileInfo = new(filePath);
+
+        if (fileInfo.Length == 0)
+        {
+            throw new InvalidDataException(
+                "The selected CSV file is empty.");
         }
 
         string[] lines = File.ReadAllLines(
@@ -26,7 +54,7 @@ public sealed class CsvTelemetryImporter
         if (lines.Length < 2)
         {
             throw new InvalidDataException(
-                "The file must contain a header and data rows.");
+                "The file must contain a header and at least one data row.");
         }
 
         char delimiter = DetectDelimiter(lines[0]);
@@ -34,7 +62,8 @@ public sealed class CsvTelemetryImporter
 
         if (headers.Count == 0)
         {
-            throw new InvalidDataException("The CSV header is empty.");
+            throw new InvalidDataException(
+                "The CSV header is empty.");
         }
 
         for (int i = 0; i < headers.Count; i++)
@@ -42,12 +71,22 @@ public sealed class CsvTelemetryImporter
             headers[i] = headers[i].Trim().Trim('\uFEFF');
 
             if (string.IsNullOrWhiteSpace(headers[i]))
+            {
                 headers[i] = $"Column_{i + 1}";
+            }
         }
 
         MakeHeadersUnique(headers);
 
         Dictionary<string, int> columns = MapColumns(headers);
+
+        if (columns.Count == 0)
+        {
+            throw new InvalidDataException(
+                "No supported telemetry columns were found.\n\n" +
+                "Supported columns include Time, Speed, RPM, Gear, " +
+                "Throttle, Brake, Distance, Latitude and Longitude.");
+        }
 
         TelemetrySession session = new()
         {
@@ -58,16 +97,22 @@ public sealed class CsvTelemetryImporter
         DataTable preview = new();
 
         foreach (string header in headers)
+        {
             preview.Columns.Add(header, typeof(string));
+        }
 
         int validRows = 0;
         int invalidRows = 0;
         int missingValues = 0;
+        int emptyRows = 0;
 
         for (int lineIndex = 1; lineIndex < lines.Length; lineIndex++)
         {
             if (string.IsNullOrWhiteSpace(lines[lineIndex]))
+            {
+                emptyRows++;
                 continue;
+            }
 
             List<string> fields;
 
@@ -93,6 +138,7 @@ public sealed class CsvTelemetryImporter
             };
 
             bool hasUsableData = false;
+            bool invalidValue = false;
 
             foreach (KeyValuePair<string, int> column in columns)
             {
@@ -106,8 +152,7 @@ public sealed class CsvTelemetryImporter
 
                 if (!TryParseNumber(value, out double number))
                 {
-                    invalidRows++;
-                    hasUsableData = false;
+                    invalidValue = true;
                     break;
                 }
 
@@ -133,9 +178,8 @@ public sealed class CsvTelemetryImporter
                             number < int.MinValue ||
                             number > int.MaxValue)
                         {
-                            hasUsableData = false;
-                            invalidRows++;
-                            goto InvalidRow;
+                            invalidValue = true;
+                            break;
                         }
 
                         record.Gear = (int)number;
@@ -167,12 +211,18 @@ public sealed class CsvTelemetryImporter
                         hasUsableData = true;
                         break;
                 }
+
+                if (invalidValue)
+                {
+                    break;
+                }
             }
 
-            InvalidRow:
-
-            if (!hasUsableData)
+            if (invalidValue || !hasUsableData)
+            {
+                invalidRows++;
                 continue;
+            }
 
             session.Records.Add(record);
             validRows++;
@@ -182,7 +232,9 @@ public sealed class CsvTelemetryImporter
                 DataRow previewRow = preview.NewRow();
 
                 for (int i = 0; i < headers.Count; i++)
+                {
                     previewRow[i] = fields[i].Trim();
+                }
 
                 preview.Rows.Add(previewRow);
             }
@@ -191,8 +243,33 @@ public sealed class CsvTelemetryImporter
         if (session.Records.Count == 0)
         {
             throw new InvalidDataException(
-                "No usable telemetry rows were found. " +
-                "Check the CSV headers and numeric values.");
+                "No usable telemetry records were found.\n\n" +
+                "Check whether the file contains valid numeric values " +
+                "in its supported telemetry columns.");
+        }
+
+        List<string> detectedChannels = columns.Keys
+            .Select(FormatChannelName)
+            .ToList();
+
+        List<string> warnings = [];
+
+        if (invalidRows > 0)
+        {
+            warnings.Add(
+                $"{invalidRows:N0} invalid row(s) were skipped.");
+        }
+
+        if (missingValues > 0)
+        {
+            warnings.Add(
+                $"{missingValues:N0} missing value(s) were detected.");
+        }
+
+        if (emptyRows > 0)
+        {
+            warnings.Add(
+                $"{emptyRows:N0} empty row(s) were ignored.");
         }
 
         return new TelemetryImportResult
@@ -203,7 +280,10 @@ public sealed class CsvTelemetryImporter
             ValidRowCount = validRows,
             InvalidRowCount = invalidRows,
             MissingValueCount = missingValues,
-            Delimiter = delimiter
+            EmptyRowCount = emptyRows,
+            Delimiter = delimiter,
+            DetectedChannels = detectedChannels,
+            Warnings = warnings
         };
     }
 
@@ -250,10 +330,29 @@ public sealed class CsvTelemetryImporter
             };
 
             if (channel is not null && !result.ContainsKey(channel))
+            {
                 result.Add(channel, i);
+            }
         }
 
         return result;
+    }
+
+    private static string FormatChannelName(string channel)
+    {
+        return channel switch
+        {
+            "time" => "Time",
+            "speed" => "Speed",
+            "rpm" => "RPM",
+            "gear" => "Gear",
+            "throttle" => "Throttle",
+            "brake" => "Brake",
+            "distance" => "Distance",
+            "latitude" => "Latitude",
+            "longitude" => "Longitude",
+            _ => channel
+        };
     }
 
     private static string NormalizeHeader(string header)
@@ -263,13 +362,17 @@ public sealed class CsvTelemetryImporter
         foreach (char character in header.ToLowerInvariant())
         {
             if (char.IsLetterOrDigit(character))
+            {
                 result.Append(character);
+            }
         }
 
         return result.ToString();
     }
 
-    private static bool TryParseNumber(string value, out double number)
+    private static bool TryParseNumber(
+        string value,
+        out double number)
     {
         if (double.TryParse(
                 value,
@@ -397,7 +500,8 @@ public sealed class CsvTelemetryImporter
 
     private static void MakeHeadersUnique(List<string> headers)
     {
-        HashSet<string> used = new(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> used =
+            new(StringComparer.OrdinalIgnoreCase);
 
         for (int i = 0; i < headers.Count; i++)
         {
@@ -430,5 +534,13 @@ public sealed class TelemetryImportResult
 
     public int MissingValueCount { get; init; }
 
+    public int EmptyRowCount { get; init; }
+
     public char Delimiter { get; init; }
+
+    public List<string> DetectedChannels { get; init; } = [];
+
+    public List<string> Warnings { get; init; } = [];
+
+    public bool HasWarnings => Warnings.Count > 0;
 }

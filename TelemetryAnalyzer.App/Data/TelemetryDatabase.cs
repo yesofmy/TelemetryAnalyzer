@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using TelemetryAnalyzer.App.Models;
 using System.IO;
@@ -13,8 +14,7 @@ public sealed class TelemetryDatabase
     public TelemetryDatabase()
     {
         string appFolder = Path.Combine(
-            Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData),
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "TelemetryAnalyzer");
 
         Directory.CreateDirectory(appFolder);
@@ -26,10 +26,7 @@ public sealed class TelemetryDatabase
             .Options;
     }
 
-    public TelemetryDbContext CreateContext()
-    {
-        return new TelemetryDbContext(_options);
-    }
+    public TelemetryDbContext CreateContext() => new(_options);
 
     public void Initialize()
     {
@@ -65,5 +62,21 @@ public sealed class TelemetryDatabase
             .Include(session => session.Records)
             .OrderByDescending(session => session.ImportedAt)
             .ToList();
+    }
+
+    public bool DeleteSession(int sessionId)
+    {
+        using TelemetryDbContext context = CreateContext();
+
+        TelemetrySession? session = context.Sessions
+            .FirstOrDefault(item => item.Id == sessionId);
+
+        if (session is null)
+            return false;
+
+        context.Sessions.Remove(session);
+        context.SaveChanges();
+
+        return true;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using TelemetryAnalyzer.App.Data;
 using TelemetryAnalyzer.App.Models;
 
 namespace TelemetryAnalyzer.App;
@@ -348,80 +348,220 @@ public partial class MainWindow : Window
             BorderBrush = BorderBrushColor,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(9),
-            Padding = new Thickness(16),
+            Padding = new Thickness(18),
             Margin = new Thickness(0, 12, 0, 0)
         };
 
-        Grid grid = new();
+        StackPanel content = new();
 
-        grid.ColumnDefinitions.Add(new ColumnDefinition
+        // SESSION HEADER
+
+        Grid header = new();
+
+        header.ColumnDefinitions.Add(new ColumnDefinition
         {
             Width = new GridLength(1, GridUnitType.Star)
         });
 
-        grid.ColumnDefinitions.Add(new ColumnDefinition
+        header.ColumnDefinitions.Add(new ColumnDefinition
         {
             Width = GridLength.Auto
         });
 
-        StackPanel details = new();
+        StackPanel titleContent = new();
 
-        details.Children.Add(new TextBlock
+        titleContent.Children.Add(new TextBlock
         {
             Text = session.Name,
             Foreground = WhiteBrush,
-            FontSize = 13,
+            FontSize = 14,
             FontWeight = FontWeights.SemiBold,
             TextWrapping = TextWrapping.Wrap
         });
 
-        details.Children.Add(new TextBlock
+        titleContent.Children.Add(new TextBlock
         {
             Text = $"Imported: {session.ImportedAt:yyyy-MM-dd HH:mm}",
             Foreground = MutedBrush,
             FontSize = 11,
-            Margin = new Thickness(0, 6, 0, 0)
+            Margin = new Thickness(0, 5, 0, 0)
         });
 
-        Button analyzeButton = CreatePrimaryButton("Analyze  →");
+        Grid.SetColumn(titleContent, 0);
+        header.Children.Add(titleContent);
 
-        analyzeButton.Margin = new Thickness(0, 12, 0, 0);
-        analyzeButton.HorizontalAlignment = HorizontalAlignment.Left;
-        analyzeButton.Click += (_, _) => OpenTelemetryAnalysis(session);
-
-        details.Children.Add(analyzeButton);
-
-        Grid.SetColumn(details, 0);
-        grid.Children.Add(details);
-
-        StackPanel recordInfo = new()
+        StackPanel actions = new()
         {
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(16, 0, 0, 0)
+            Orientation = Orientation.Horizontal,
+            VerticalAlignment = VerticalAlignment.Center
         };
 
-        recordInfo.Children.Add(new TextBlock
+        Button analyzeButton = CreatePrimaryButton("Analyze");
+
+        analyzeButton.Margin = new Thickness(8, 0, 0, 0);
+        analyzeButton.Click += (_, _) => OpenTelemetryAnalysis(session);
+
+        Button deleteButton = CreateSecondaryButton("Delete");
+
+        deleteButton.Margin = new Thickness(8, 0, 0, 0);
+        deleteButton.Foreground = new SolidColorBrush(
+            Color.FromRgb(255, 120, 120));
+
+        deleteButton.Click += (_, _) => DeleteSession_Click(session);
+
+        actions.Children.Add(analyzeButton);
+        actions.Children.Add(deleteButton);
+
+        Grid.SetColumn(actions, 1);
+        header.Children.Add(actions);
+
+        content.Children.Add(header);
+
+        // SESSION STATISTICS
+
+        content.Children.Add(new Border
         {
-            Text = session.Records.Count.ToString("N0"),
-            Foreground = AccentBrush,
-            FontSize = 18,
-            FontWeight = FontWeights.SemiBold,
-            HorizontalAlignment = HorizontalAlignment.Right
+            Height = 1,
+            Background = BorderBrushColor,
+            Margin = new Thickness(0, 16, 0, 14)
         });
 
-        recordInfo.Children.Add(new TextBlock
+        Grid statistics = new();
+
+        for (int i = 0; i < 4; i++)
         {
-            Text = "records",
-            Foreground = MutedBrush,
-            FontSize = 10,
-            HorizontalAlignment = HorizontalAlignment.Right
-        });
+            statistics.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+        }
 
-        Grid.SetColumn(recordInfo, 1);
-        grid.Children.Add(recordInfo);
+        double? minimumSpeed = session.MinimumSpeed;
+        double? maximumSpeed = session.MaximumSpeed;
+        double? averageSpeed = session.AverageSpeed;
 
-        card.Child = grid;
+        string FormatSpeed(double? value)
+        {
+            return value.HasValue
+                ? $"{value.Value:F1}"
+                : "—";
+        }
+
+        double[] times = session.Records
+            .Where(record => record.Time.HasValue)
+            .Select(record => record.Time!.Value)
+            .Where(double.IsFinite)
+            .ToArray();
+
+        string duration = "—";
+
+        if (times.Length >= 2)
+        {
+            double seconds = times.Max() - times.Min();
+
+            if (seconds >= 0 && double.IsFinite(seconds))
+            {
+                TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
+
+                duration = timeSpan.TotalHours >= 1
+                    ? timeSpan.ToString(@"h\:mm\:ss\.fff")
+                    : timeSpan.ToString(@"mm\:ss\.fff");
+            }
+        }
+
+        (string Label, string Value, string Color)[] values =
+        [
+            ("RECORDS", session.Records.Count.ToString("N0"), "#56B4E9"),
+            ("DURATION", duration, "#FFFFFF"),
+            ("MIN SPEED", FormatSpeed(minimumSpeed), "#55D6A0"),
+            ("MAX SPEED", FormatSpeed(maximumSpeed), "#FF9F43")
+        ];
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            StackPanel item = new()
+            {
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+
+            item.Children.Add(new TextBlock
+            {
+                Text = values[i].Label,
+                Foreground = MutedBrush,
+                FontSize = 9,
+                FontWeight = FontWeights.SemiBold
+            });
+
+            item.Children.Add(new TextBlock
+            {
+                Text = values[i].Value,
+                Foreground = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString(values[i].Color)),
+                FontSize = 17,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 6, 0, 0)
+            });
+
+            Grid.SetColumn(item, i);
+            statistics.Children.Add(item);
+        }
+
+        content.Children.Add(statistics);
+
+        if (averageSpeed.HasValue)
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = $"Average speed: {averageSpeed.Value:F1}",
+                Foreground = MutedBrush,
+                FontSize = 11,
+                Margin = new Thickness(0, 12, 0, 0)
+            });
+        }
+
+        card.Child = content;
+
         return card;
+    }
+
+    private void DeleteSession_Click(TelemetrySession session)
+    {
+        MessageBoxResult result = MessageBox.Show(
+            $"Are you sure you want to delete this session?\n\n" +
+            $"{session.Name}\n\n" +
+            $"Records: {session.Records.Count:N0}\n\n" +
+            "This action cannot be undone.",
+            "Delete Telemetry Session",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            bool deleted = App.Database.DeleteSession(session.Id);
+
+            if (!deleted)
+            {
+                MessageBox.Show(
+                    "The selected session could not be found.",
+                    "Delete Session",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+
+            ShowSessionsPage();
+            RefreshDashboard();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Unable to delete the selected session.\n\n{ex.Message}",
+                "Delete Session",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
     // ---------------------------------------------------------
