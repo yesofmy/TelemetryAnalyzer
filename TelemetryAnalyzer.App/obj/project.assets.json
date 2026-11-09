@@ -4352,11 +4352,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.App\\TelemetryAnalyzer.App.csproj",
+      "projectUniqueName": "D:\\programs\\github\\telemetryanalyzer\\telemetryanalyzer.app\\TelemetryAnalyzer.App.csproj",
       "projectName": "TelemetryAnalyzer.App",
-      "projectPath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.App\\TelemetryAnalyzer.App.csproj",
+      "projectPath": "D:\\programs\\github\\telemetryanalyzer\\telemetryanalyzer.app\\TelemetryAnalyzer.App.csproj",
       "packagesPath": "C:\\Users\\Vlad\\.nuget\\packages\\",
-      "outputPath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.App\\obj\\",
+      "outputPath": "D:\\programs\\github\\telemetryanalyzer\\telemetryanalyzer.app\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Vlad\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -4373,8 +4373,8 @@
           "framework": "net10.0-windows10.0.19041",
           "targetAlias": "net10.0-windows10.0.19041",
           "projectReferences": {
-            "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {
-              "projectPath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj"
+            "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {
+              "projectPath": "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj"
             }
           }
         }

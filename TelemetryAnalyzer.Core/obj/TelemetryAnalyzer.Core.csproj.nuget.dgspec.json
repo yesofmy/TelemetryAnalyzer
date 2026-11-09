@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {}
+    "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {}
   },
   "projects": {
-    "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {
+    "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj",
+        "projectUniqueName": "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj",
         "projectName": "TelemetryAnalyzer.Core",
-        "projectPath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj",
+        "projectPath": "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\TelemetryAnalyzer.Core.csproj",
         "packagesPath": "C:\\Users\\Vlad\\.nuget\\packages\\",
-        "outputPath": "D:\\programs\\GitHub\\TelemetryAnalyzer\\TelemetryAnalyzer.Core\\obj\\",
+        "outputPath": "D:\\programs\\github\\telemetryanalyzer\\TelemetryAnalyzer.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Vlad\\AppData\\Roaming\\NuGet\\NuGet.Config"
